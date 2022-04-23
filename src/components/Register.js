@@ -23,6 +23,7 @@ const Register = (props) => {
   };
 
   const handleSubmit = async (e) => {
+    
     AuthService.register(usernameRegister, emailRegister, passwordRegister)
       .then((data) => {
         setUsernameRegister("");

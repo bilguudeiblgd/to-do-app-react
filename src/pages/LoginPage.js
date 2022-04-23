@@ -10,7 +10,6 @@ const LoginPage = () => {
   const [passwordLogin, setPasswordLogin] = useState("");
   const [register, setRegister] = useState(false);
 
-  
   const [errorMsg, setErrorMsg] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   let navigate = useNavigate();
@@ -29,33 +28,31 @@ const LoginPage = () => {
   };
   const handlePassword = (password) => {
     if (password.length <= 6) {
-      console.log("length")
       setErrorPassword("Password must be contain 6 characters");
       return false;
     }
     return true;
   };
-  const onLoginSubmit = (e) => {
+  const onLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     setErrorPassword("");
-   
+
     if (!handlePassword(passwordLogin)) return;
-    AuthService.login(emailLogin, passwordLogin)
-      .then((data) => {
-        
-        if(!data)
-        {
-          setErrorMsg("Username or password doesn't match");
-          return;
-        }
-        setEmailLogin("");
-        setPasswordLogin("");
-        alert("Successfully logged in");
-        navigate("/");
-       
-      });
-      
+
+    try {
+      const response = await AuthService.login(emailLogin, passwordLogin);
+
+      setEmailLogin("");
+      setPasswordLogin("");
+      alert("Successfully logged in");
+
+      navigate("/");
+      window.location.reload();
+    } catch (err) {
+      setErrorMsg("Username or password doesn't match");
+      return;
+    }
   };
 
   return (
@@ -83,7 +80,7 @@ const LoginPage = () => {
                   </div>{" "}
                   <div className={"border-b-2 my-6 width-full"}> </div>{" "}
                   {/* Form inputs */}{" "}
-                  <form onSubmit={(e) => onLoginSubmit(e)}>
+                  <form onSubmit={onLoginSubmit}>
                     <div className={"flex mb-4 flex-col"}>
                       <label htmlFor="email" className={"mb-1"}>
                         Email{" "}
@@ -96,7 +93,6 @@ const LoginPage = () => {
                         type="email"
                         required
                       />
-                    
                     </div>{" "}
                     <div className={"flex mb-4 flex-col"}>
                       <label htmlFor="password" className={"mb-1"}>

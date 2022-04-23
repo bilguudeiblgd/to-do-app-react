@@ -3,21 +3,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import AuthContext from "../content/AuthProvider";
 import AuthService from "../service/auth-service";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export const Navbar = (props) => {
+  
   const { auth, setAuth } = useContext(AuthContext);
+  const [loggedIn, setLoggedIn] = useState(false);
   let navigate = useNavigate();
 
-  let userExists;
   useEffect(() => {
-      userExists = localStorage.getItem('user');
+    const token = localStorage.getItem("userToken");
+    if(token) {
+      setLoggedIn(true);
+      
+    }
   }, []);
 
   const onClickLogout = (e) => {
     AuthService.logout();
     alert("Successfully logged out!");
-    navigate("/");
+   
   };
 
   return (
@@ -31,27 +36,25 @@ export const Navbar = (props) => {
         </li>
         <li>
           <div>
-          <Link to="/login">
-                <div className={"flex items-center cursor-pointer flex-row"}>
-                  
-                  <HiOutlineUserCircle className={"mr-2"} size={"40px"} />
-                  <p className={"text-md font-medium"}>Login</p>
-                </div>
-              </Link>
-            {/* {auth != {} ? (
-              
-            ) : (
+            {loggedIn ? (
               <button
                 onClick={onClickLogout}
                 className={"flex flex-row items-center"}
               >
                 <img
                   className={"w-12 h-12 mr-2"}
-                  src={`https://avatars.dicebear.com/api/jdenticon/${username}.svg`}
+                  src={`https://avatars.dicebear.com/api/jdenticon/${auth.id}.svg`}
                 />
                 <p className={"text-md text-gray-400 font-medium"}>Logout</p>
               </button>
-            )} */}
+            ) : (
+              <Link to="/login">
+                <div className={"flex items-center cursor-pointer flex-row"}>
+                  <HiOutlineUserCircle className={"mr-2"} size={"40px"} />
+                  <p className={"text-md font-medium"}>Login</p>
+                </div>
+              </Link>
+            )}
           </div>
         </li>
       </ul>

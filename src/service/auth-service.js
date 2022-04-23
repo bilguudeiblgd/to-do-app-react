@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://192.168.5.178:8000/api";
+const BASE_URL = "http://192.168.5.178:8001/api";
 
 class AuthService {
     register(name, email, password) {
@@ -11,10 +11,10 @@ class AuthService {
                 password,
             })
             .then((response) => {
-                if (response.data.token) {
+                if (response.data.data.token) {
                     localStorage.setItem(
                         "userToken",
-                        JSON.stringify(response.data.token)
+                        response.data.data.token
                     );
                 }
                 return response.data;
@@ -24,37 +24,38 @@ class AuthService {
             });
     }
     login(email, password) {
-
         return axios
             .post(`${BASE_URL}/login`, {
                 email,
                 password,
             })
             .then((response) => {
-                console.log(response);
-                if (response.data.token) {
-                    localStorage.setItem(
-                        "userToken",
-                        JSON.stringify(response.data.token)
-                    );
+                const token = response.data.data.token;
+                if (token) {
+                    localStorage.setItem("userToken", token);
                 }
+
                 return response.data;
-            })
-
-
+            });
     }
     getUserData(token) {
+
         const config = {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ` + token, Accept: "application/json" },
         };
-        return axios.get(`${BASE_URL}/user`, config)
+
+        return axios
+            .get(`${BASE_URL}/user`, config)
             .then((response) => {
-                console.log(response);
+                return response.data.data;
+            })
+            .catch((err) => {
+                console.log(err);
             });
     }
 
     logout() {
-        localStorage.removeItem("user");
+        localStorage.removeItem("userToken");
         window.location.reload();
     }
     getCurrentUser() {
